@@ -3,14 +3,14 @@ name: CI/CD WebSocket Deployment
 on:
   push:
     branches:
-      - main # Or the branch you deploy from, e.g., 'develop'
+      - main # Or your preferred deployment branch
 
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repo
+    - name: Checkout repository
       uses: actions/checkout@v3
 
     - name: Set up Docker Buildx
@@ -26,9 +26,9 @@ jobs:
       uses: docker/build-push-action@v4
       with:
         push: true
-        tags: ${{ secrets.DOCKERHUB_USERNAME }}/websocket:latest # Specific tag for your WebSocket service
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/websocket:latest
         context: .
-        file: ./Dockerfile # Assuming Dockerfile is in the root of this repo
+        file: ./Dockerfile
   
     - name: Deploy WebSocket to DigitalOcean Droplet
       uses: appleboy/ssh-action@v0.1.7
@@ -44,7 +44,7 @@ jobs:
           docker stop websocket || true
           docker rm websocket || true
           
-          # Run the new WebSocket container, mapping port 3000
-          docker run -d --name websocket -p 3000:3000 ${{ secrets.DOCKERHUB_USERNAME }}/websocket:latest
+          # Run the new WebSocket container, mapping port 3012
+          docker run -d --name websocket -p 3012:3012 ${{ secrets.DOCKERHUB_USERNAME }}/websocket:latest
           
           echo "WebSocket deployment completed!"
