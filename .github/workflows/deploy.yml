@@ -3,7 +3,7 @@ name: CI/CD WebSocket Deployment
 on:
   push:
     branches:
-      - main # Or your preferred deployment branch
+      - main  # adjust if you deploy from a different branch
 
 jobs:
   build_and_deploy:
@@ -27,9 +27,9 @@ jobs:
       with:
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/websocket:latest
-        context: .
-        file: ./Dockerfile
-  
+        context: .             # root
+        file: ./Dockerfile     # root
+
     - name: Deploy WebSocket to DigitalOcean Droplet
       uses: appleboy/ssh-action@v0.1.7
       with:
@@ -37,14 +37,14 @@ jobs:
         username: ${{ secrets.DO_SSH_USER }}
         key: ${{ secrets.DO_SSH_PRIVATE_KEY }}
         script: |
-          # Pull the latest Docker image for your WebSocket service
+          # Pull the latest image
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/websocket:latest
-          
-          # Stop and remove any existing container named 'websocket'
+
+          # Stop and remove existing container
           docker stop websocket || true
           docker rm websocket || true
-          
-          # Run the new WebSocket container, mapping port 3012
+
+          # Run the new container with correct port mapping
           docker run -d --name websocket -p 3012:3012 ${{ secrets.DOCKERHUB_USERNAME }}/websocket:latest
-          
+
           echo "WebSocket deployment completed!"
